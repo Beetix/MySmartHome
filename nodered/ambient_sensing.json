@@ -1,0 +1,116 @@
+[
+    {
+        "id": "b302e029.b91fe",
+        "type": "tab",
+        "label": "Ambient sensing",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "e89cc977.5b0778",
+        "type": "mqtt in",
+        "z": "b302e029.b91fe",
+        "name": "",
+        "topic": "OpenMQTTGateway_ESP32_ATOM_BLE_IR/BTtoMQTT/+",
+        "qos": "2",
+        "datatype": "json",
+        "broker": "3fa71463.3a0b1c",
+        "x": 660,
+        "y": 300,
+        "wires": [
+            [
+                "7e2c24e.0f4035c"
+            ]
+        ]
+    },
+    {
+        "id": "7e2c24e.0f4035c",
+        "type": "switch",
+        "z": "b302e029.b91fe",
+        "name": "Is LYWSD03MMC_ATC",
+        "property": "payload.model",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "LYWSD03MMC_ATC",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1050,
+        "y": 300,
+        "wires": [
+            [
+                "170edbf.ac15d24"
+            ]
+        ]
+    },
+    {
+        "id": "f53348c9.4ae1",
+        "type": "influxdb out",
+        "z": "b302e029.b91fe",
+        "influxdb": "e41ec9d4.f120d",
+        "name": "",
+        "measurement": "LYWSD03MMC_ATC",
+        "precision": "",
+        "retentionPolicy": "",
+        "x": 1630,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "170edbf.ac15d24",
+        "type": "function",
+        "z": "b302e029.b91fe",
+        "name": "MQTT to InfluxDB",
+        "func": "const { id, tempc, hum, batt, volt, rssi } = msg.payload;\nconst fields = { tempc, hum, batt, volt, rssi};\n\nconst tags = {\n    'id' : id\n};\n\nmsg.payload = [\n    fields,\n    tags\n];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1310,
+        "y": 300,
+        "wires": [
+            [
+                "f53348c9.4ae1"
+            ]
+        ]
+    },
+    {
+        "id": "3fa71463.3a0b1c",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "mybroker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": false,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "e41ec9d4.f120d",
+        "type": "influxdb",
+        "z": "",
+        "hostname": "influxhost",
+        "port": "8086",
+        "protocol": "http",
+        "database": "mydb",
+        "name": "",
+        "usetls": false,
+        "tls": ""
+    }
+]
