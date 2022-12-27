@@ -1,0 +1,92 @@
+substitutions:
+  device_name: loratap-sc400w
+  name: "LoraTap SC400W"
+
+esphome:
+  name: $device_name
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
+
+# Enable logging
+logger:
+  level: NONE
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  <<: !include ../network/wifi.yaml
+
+captive_portal:
+
+# Tasmota
+# https://templates.blakadder.com/loratap_SC400W.html
+
+switch:
+  - platform: gpio
+    pin: GPIO15
+    interlock: &interlock [open_cover, close_cover]
+    id: open_cover
+    restore_mode: RESTORE_DEFAULT_OFF
+    interlock_wait_time: 200ms
+    
+  - platform: gpio
+    pin: GPIO13
+    interlock: *interlock
+    id: close_cover
+    restore_mode: RESTORE_DEFAULT_OFF
+    interlock_wait_time: 200ms
+
+cover:
+- platform: time_based
+  name: "${name}"
+  id: my_cover
+  open_action:
+    - switch.turn_on: open_cover
+  open_duration: 13s
+  close_action:
+    - switch.turn_on: close_cover
+  close_duration: 12s
+  stop_action:
+    - switch.turn_off: open_cover
+    - switch.turn_off: close_cover
+
+binary_sensor:
+  - platform: gpio
+    name: "${name} UP"
+    id: up
+    pin:
+      number: GPIO5
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        cover.open: my_cover
+
+  - platform: gpio
+    name: "${name} DOWN"
+    id: down
+    pin:
+      number: GPIO12
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        cover.close: my_cover
+      
+  - platform: gpio
+    name: "${name} STOP"
+    id: stop
+    pin:
+      number: GPIO3
+      mode: INPUT_PULLUP
+    on_press:
+      then:
+        cover.stop: my_cover
+
+status_led:
+  pin: GPIO0
