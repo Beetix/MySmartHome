@@ -1,9 +1,9 @@
 ssid: "SSID"
-password: "PASSWORD"
+password: !secret wifi_password
 
 # Enable fallback hotspot (captive portal) in case wifi connection fails
 ap:
-  ssid: "${name} Fallback Hotspot"
-  password: "PASSWORD"
+  ssid: "${name} Fallback AP"
+  password: !secret ap_password
 
 domain: ".lan"
