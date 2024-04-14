@@ -56,6 +56,7 @@ cover:
   stop_action:
     - switch.turn_off: open_cover
     - switch.turn_off: close_cover
+  has_built_in_endstop: true
 
 binary_sensor:
   - platform: gpio
